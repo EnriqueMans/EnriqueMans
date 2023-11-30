@@ -1,0 +1,9 @@
+import pandas as pd
+df1 = pd.DataFrame({'col1': ['pizza', 'hamburger', 'hamburger', 'pizza', 'ice cream'], 'col2': ['boy', 'boy', 'girl', 'girl', 'boy']}, index=range(1,6))
+df2 = pd.DataFrame({'col1': ['pizza', 'pizza', 'chicken', 'cake', 'cake', 'chicken', 'ice cream'], 'col2': ['boy', 'girl', 'girl', 'boy', 'girl', 'boy', 'boy']}, index=range(10,17))
+df1[df1.set_index(['col1','col2']).index.isin(df2.set_index(['col1','col2']).index)]
+
+out = (df1[df1['date'].isin(df2['date']) & 
+           df1['agent_id'].isin(df2['agent_id']) & 
+           (df1['final_gps'].isin(df2['gps1']) | df1['final_gps'].isin(df2['gps2']))]
+       .reset_index(drop=True))
