@@ -1,0 +1,12 @@
+import pandas as pd
+
+df1 = pd.DataFrame({"Id": [1, 1, 2, 3, 2],
+                    "sendDate": ["2019-09-24", "2020-09-11",
+                                 "2018-01-06", "2018-01-06",
+                                 "2019-09-24"]})
+
+df2 = pd.DataFrame({"Id": [1, 2, 2],
+                    "actDate": ["2019-09-24", "2019-09-24", "2020-09-11"]})
+
+df1['Match'] = (df1['Id'].isin(df2['Id'])) & (df1['sendDate'].isin(df2['actDate']))
+print(df1)
