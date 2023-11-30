@@ -1,0 +1,5 @@
+df = pd.merge(df1, df2, on=['User','Movie'], how='left', indicator='Exist')
+df.drop('Rating', inplace=True, axis=1)
+df['Exist'] = np.where(df.Exist == 'both', True, False)
+print (df)
+   
