@@ -29,22 +29,27 @@ ppx_df['TermDate'] = pd.to_datetime(ppx_df['TermDate'], format='%Y%m%d')
 dflt_df['EffectiveDate'] = pd.to_datetime(dflt_df['EffectiveDate'], format='%Y%m%d')
 
 # Function to find matching PBP from PPX
+ppx_df['EffDate'] = pd.to_datetime(ppx_df['EffDate'], format='%Y%m%d')
+ppx_df['TermDate'] = pd.to_datetime(ppx_df['TermDate'], format='%Y%m%d')
+dflt_df['EffectiveDate'] = pd.to_datetime(dflt_df['EffectiveDate'], format='%Y%m%d')
+
+# Function to apply SQL-like logic and find PBP
 def find_pbp(row):
-    matches = ppx_df.copy()
-    matches = matches[
-        ((matches['Over65'] == '') | (matches['Over65'] == row['Over65'])) &
-        ((matches['HARP'] == '') | (matches['HARP'] == row['HARP'])) &
-        ((matches['ClassNumber'] == '0000') | (matches['ClassNumber'] == row['ClassNumber'])) &
-        (matches['LTSS'] == row['LTSS_Indicator']) &
-        (row['EffectiveDate'] >= matches['EffDate']) &
-        (row['EffectiveDate'] <= matches['TermDate'])
+    if row['Default_Eligible_Indicator'] != 'Y':
+        return None
+    matches = ppx_df[
+        ((ppx_df['Over65'] == '') | (ppx_df['Over65'] == row['Over65'])) &
+        ((ppx_df['HARP'] == '') | (ppx_df['HARP'] == row['HARP'])) &
+        ((ppx_df['ClassNumber'] == '0000') | (ppx_df['ClassNumber'] == row['ClassNumber'])) &
+        (ppx_df['LTSS'] == row['LTSS_Indicator']) &
+        (row['EffectiveDate'] >= ppx_df['EffDate']) &
+        (row['EffectiveDate'] <= ppx_df['TermDate'])
     ]
     if not matches.empty:
-        return matches.iloc[0]['PBP']  # return the PBP identifier
-    else:
-        return None
+        return matches.iloc[0]['PBP']  # Return first match
+    return None
 
-# Apply function to DFLT
+# Apply function
 dflt_df['PBP'] = dflt_df.apply(find_pbp, axis=1)
 
 # Show result
